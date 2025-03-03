@@ -6,13 +6,14 @@ import random
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from models import Game, Review
+from models import Game, Review, User
 
 if __name__ == '__main__':
     engine = create_engine('sqlite:///many_to_many.db')
     Session = sessionmaker(bind=engine)
     session = Session()
 
+    session.query(User).delete()
     session.query(Game).delete()
     session.query(Review).delete()
 
@@ -25,6 +26,13 @@ if __name__ == '__main__':
         'playstation 5', 'xbox', 'xbox 360', 'xbox one', 'pc']
 
     games = []
+    for i in range(25):
+        user = User(
+            name=fake.name(),
+        )
+        session.add(user)
+        session.commit()
+
     for i in range(50):
         game = Game(
             title=fake.unique.name(),
@@ -44,6 +52,7 @@ if __name__ == '__main__':
         for i in range(random.randint(1,5)):
             
             review = Review(
+                user_id=user.id,
                 score=random.randint(0, 10),
                 comment=fake.sentence(),
                 game_id=game.id,
